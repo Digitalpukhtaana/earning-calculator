@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ur-Latn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Pukhtaana — Earning Calculator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--teal:#0d3b36;--teal2:#115e57;--accent:#f2b544;--card:#ffffff;--ink:#12211f;--muted:#5c6f6b}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:linear-gradient(160deg,var(--teal) 0%,#08302b 55%,#06231f 100%);color:var(--ink);min-height:100vh;padding:20px 14px 40px}
+.wrap{max-width:520px;margin:0 auto}
+.hero{text-align:center;color:#fff;padding:18px 8px 22px}
+.hero .brand{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);font-weight:700}
+.hero h1{font-size:29px;line-height:1.25;margin:8px 0 6px}
+.hero p{font-size:15px;color:#cfe3df;line-height:1.6}
+.hero .founders{margin-top:12px;font-size:13px;color:#9fc4bd}
+.card{background:var(--card);border-radius:18px;padding:20px 18px;box-shadow:0 14px 34px rgba(0,0,0,.28);margin-bottom:16px}
+label{display:block;font-size:13px;font-weight:700;color:var(--teal2);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.4px}
+label:first-of-type{margin-top:0}
+select{width:100%;padding:12px;border:2px solid #dce8e5;border-radius:10px;font-size:16px;background:#fbfdfd;color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--teal2);margin-top:6px}
+.views-val{font-size:22px;font-weight:800;color:var(--teal);text-align:center;margin-top:4px}
+button{width:100%;margin-top:20px;background:var(--accent);color:#231a02;border:none;padding:15px;border-radius:12px;font-size:17px;font-weight:800;cursor:pointer}
+button:active{transform:scale(.99)}
+#result{display:none}
+#result h2{font-size:19px;color:var(--teal);margin-bottom:4px}
+.range{font-size:27px;font-weight:800;color:var(--teal2);margin:8px 0 2px}
+.sub{font-size:13px;color:var(--muted);line-height:1.6}
+.best{margin-top:14px;background:#eef7f4;border-left:4px solid var(--teal2);padding:12px;border-radius:8px;font-size:14px;line-height:1.6}
+.ideas{margin-top:14px}
+.ideas h3{font-size:15px;color:var(--teal);margin-bottom:8px}
+.ideas li{margin:0 0 8px 18px;font-size:14px;line-height:1.6}
+.cta{text-align:center}
+.cta h2{font-size:19px;color:var(--teal);margin-bottom:6px}
+.cta p{font-size:14px;color:var(--muted);line-height:1.7}
+.cta a{display:inline-block;margin-top:14px;background:var(--teal2);color:#fff;text-decoration:none;padding:13px 26px;border-radius:12px;font-weight:800;font-size:15px}
+.links{font-size:13px;color:var(--muted);line-height:1.8;text-align:center}
+.links b{color:var(--teal)}
+.how details{font-size:14px;line-height:1.7;color:var(--muted)}
+.how summary{font-size:16px;font-weight:800;color:var(--teal);cursor:pointer;margin-bottom:8px}
+.how code{background:#eef7f4;padding:2px 6px;border-radius:6px;font-size:13px;color:var(--teal)}
+.how li{margin:0 0 6px 18px}
+.lang-toggle{display:flex;gap:8px;justify-content:center;margin-bottom:14px}
+.lang-toggle button{width:auto;margin:0;padding:8px 14px;font-size:13px;background:#ffffff;color:var(--teal);border:2px solid var(--accent)}
+.lang-toggle button.active{background:var(--accent);color:#231a02}
+button.secondary{background:var(--teal2);color:#fff}
+button.ghost{background:#eef7f4;color:var(--teal);border:2px solid var(--teal2)}
+.fbline{margin-top:14px;font-size:14px;font-weight:700;color:var(--teal);background:#fff8e6;border:1px solid var(--accent);padding:12px;border-radius:8px;line-height:1.6}
+footer{text-align:center;color:#8fb3ab;font-size:12px;line-height:1.7;margin-top:20px;padding:0 8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="brand">Digital Pukhtaana</div>
+    <h1 id="mainTitle">Creator Earning Calculator</h1>
+    <p id="heroPara">Apne rozana views se andaza lagao ke Facebook, TikTok ya YouTube se mahine mein kitni kamai ho sakti hai — aur konsa platform tumhare liye best hai.</p>
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button type="button" id="langUr" class="active" onclick="setLang('ur')">Urdu</button>
+      <button type="button" id="langEn" onclick="setLang('en')">English</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <label id="lblPlatform">Platform chuno</label>
+    <select id="platform" onchange="updateFormatOptions()">
+      <option value="facebook">Facebook</option>
+      <option value="tiktok">TikTok</option>
+      <option value="youtube">YouTube</option>
+    </select>
+
+    <label id="lblFormat">Content format chuno</label>
+    <select id="format">
+      <option value="long">Long video</option>
+      <option value="short">Short video / Reel</option>
+    </select>
+
+    <label id="lblNiche">Apna niche / content type</label>
+    <select id="niche">
+      <option value="comedy">Comedy / Funny</option>
+      <option value="vlog">Vlog / Daily Life</option>
+      <option value="tech">Tech Review</option>
+      <option value="islamic">Islamic / Motivation</option>
+      <option value="cleaning">Safai / Cleaning Hacks</option>
+      <option value="gym">Gym / Fitness</option>
+      <option value="food">Food / Cooking</option>
+      <option value="poetry">Shayari / Poetry / Pashto Culture</option>
+      <option value="education">Education / Tutorials</option>
+      <option value="business">Business / Online Kamai</option>
+      <option value="stories">Stories / Reddit Stories</option>
+      <option value="animals">Animals / Pets / Wildlife</option>
+      <option value="gaming">Gaming</option>
+      <option value="travel">Travel / Gaon ki Zindagi</option>
+      <option value="kids">Kids / Cartoon</option>
+      <option value="news">News / Current Affairs</option>
+      <option value="beauty">Beauty / Fashion</option>
+    </select>
+
+    <label id="lblCountry">Audience zyada tar kis mulk se hai?</label>
+    <select id="country">
+      <option value="usa">USA</option>
+      <option value="uk">UK / Europe</option>
+      <option value="uae">UAE / Gulf</option>
+      <option value="pk">Pakistan / India</option>
+    </select>
+
+    <label id="lblViews">Rozana kitne views aate hain?</label>
+    <input type="range" id="views" min="1000" max="1000000" step="1000" value="50000">
+    <div class="views-val" id="viewsVal">50,000 views / din</div>
+
+    <button id="calcBtn" onclick="calculate()">Kamai ka andaza lagao</button>
+    <button type="button" id="shareBtn" class="ghost" onclick="shareCalc()">Calculator share karo</button>
+  </div>
+
+  <div class="card" id="result">
+    <h2 id="resultTitle">Tumhara mahana andaza (Estimated Range)</h2>
+    <div class="range" id="rangeOut"></div>
+    <div class="sub" id="rpmNote"></div>
+    <div class="sub" id="tiktokNote" style="display:none;margin-top:8px;font-weight:700;color:var(--teal)">TikTok Creator Rewards sirf 1 minute se lambi original video par milta hai. Chhoti video par ye andaza lagu nahi hota.</div>
+    <div class="sub" id="youtubeShortsNote" style="display:none;margin-top:8px;font-weight:700;color:var(--teal)">YouTube ne announce kiya hai ke 1 February 2027 se Shorts ki kamai sirf unhi channels ko milegi jin ke pichle 90 din mein 10 million qualified Shorts views hon. Is liye ye andaza aage chal kar chhote channels par lagu nahi hoga.</div>
+    <div class="best" id="bestOut"></div>
+    <div class="ideas">
+      <h3 id="ideasTitle">Is combination ke liye 3 original content ideas</h3>
+      <ol id="ideasOut"></ol>
+    </div>
+    <div class="fbline" id="fbline">Facebook par is system ko seekhna hai to Digital Pukhtaana join karo.</div>
+    <button type="button" id="waBtn" class="secondary" onclick="shareOnWhatsApp()">Ye result WhatsApp par bhejo</button>
+    <div class="sub" id="resultNote" style="margin-top:10px">Note: Ye sirf aik estimated range hai, guaranteed earning nahi. Asal RPM aur earning waqt ke saath badalti rehti hai — platform ki policy, kitne views monetized hue, audience kis mulk se hai, content ki lambai aur quality, aur mausam (Q4 mein rates aam tor par zyada, Q1 mein kam) is par asar daalte hain. TikTok par sirf qualified views (5 second se zyada, original 1-minute se lambi video) count hote hain, aur YouTube Shorts ki RPM long-form ke muqable mein bohat kam (takreeban $0.03–$0.08) hoti hai.</div>
+  </div>
+
+  <div class="card how">
+    <details>
+      <summary id="howTitle">How is this calculated?</summary>
+      <div id="howBody">
+      <p><b>Formula:</b> <code>Mahana andaza = (Rozana views × 30 ÷ 1,000) × RPM × Niche asar</code></p>
+      <p style="margin-top:8px"><b>RPM</b> ka matlab hai creator ko 1,000 views par asal mein kitne dollar milte hain. Ye woh raqam nahi jo advertiser deta hai (use CPM kehte hain) — RPM us ke baad ki, creator ke hisay wali raqam hai.</p>
+      <ul>
+        <li><b>Har view par paisa nahi banta.</b> Sirf un views par kamai hoti hai jin par asal mein ad chala (monetized views). Isi liye ye calculator jaan boojh kar darmiyani, mehfooz range istemal karta hai.</li>
+        <li><b>Platform aur mulk sab se bara farq hai.</b> USA/UK ki audience par advertiser zyada deta hai, Pakistan ki audience par bohat kam — is liye wohi views aik mulk mein zyada aur doosray mein kam kamate hain.</li>
+        <li><b>Niche ka asar (rough estimate):</b> Niche multipliers sirf rough estimate hain, pakki raqam nahi. Tech jaisay mauzu par advertiser zyada deta hai, comedy par kam lekin views zyada aate hain — calculator is farq ko aik chhota sa zarb laga kar dikhata hai.</li>
+        <li>Niche multipliers zyada tar YouTube Studio data (300 channels) se nikale gaye hain, aur Facebook/TikTok par farq mukhtalif ho sakta hai. Education jaise niches ke andar bhi channels ka farq bohat bada hota hai.</li>
+        <li><b>Short video / Reel:</b> Facebook Reels par RPM $0.02–$0.20 aur YouTube Shorts par $0.03–$0.08 rakha gaya hai, is liye short format ka andaza long video se bohat kam aata hai. Short RPM par mulk ka zarb bhi lagta hai (rough estimate): USA 1.0, UK 0.9, UAE 0.5, Pakistan 0.15 — ye bhi rough estimate hai, pakki raqam nahi.</li>
+        <li><b>Misaal:</b> 50,000 views rozana × 30 = 15 lakh views mahana. Agar RPM $3 hai to 1,500 × $3 = takreeban $4,500 mahana — phir niche ka rough asar lagta hai.</li>
+      </ul>
+      </div>
+    </details>
+  </div>
+
+  <div class="card cta">
+    <h2 id="ctaTitle">Digital Pukhtaana — agla qadam yahin se</h2>
+    <p id="ctaPara">Ye calculator sirf andaza deta hai. Asal system — sahi platform chunna, RPM barhana aur views ko asal kamai mein badalna — Digital Pukhtaana mein seekhaya jata hai. Creators ke liye, seedhi Roman Urdu mein.</p>
+    <a id="ctaBtn" href="https://wa.me/923340926285?text=Assalam-o-Alaikum!%20Main%20Digital%20Pukhtaana%20join%20karna%20chahta%20hoon.%20Earning%20Calculator%20se%20mujhe%20apni%20kamai%20ka%20andaza%20mila%20hai%2C%20ab%20mujhe%20is%20system%20ko%20seekhna%20hai.">Digital Pukhtaana Join Karo</a>
+  </div>
+
+  <footer id="footerText">
+    Digital Pukhtaana.<br>
+    Ye calculator sirf estimated range deta hai, guaranteed earning nahi. Asal RPM aur earnings platform, monetized views, audience ke mulk, content aur time ke saath badalte rehte hain.
+  </footer>
+</div>
+
+<script>
+// RPM ranges estimated hain, waqt ke saath badalti hain.
+// RPM = creator ke haath mein aane wali raqam per 1,000 total views (USD). Ye CPM nahi hai.
+// Har view par ad nahi chalta — sirf monetized views kamate hain, is liye ranges conservative rakhi gayi hain.
+var RPM = {
+  facebook:{usa:[2.0,6.0], uk:[1.5,4.5], uae:[0.8,2.5], pk:[0.08,0.60]},
+  tiktok:{usa:[0.40,1.00], uk:[0.35,0.90], uae:[0.10,0.40], pk:[0.02,0.10]},
+  youtube:{usa:[3.0,11.0], uk:[3.0,8.0], uae:[1.5,4.0], pk:[0.40,1.50]}
+};
+// Short video / Reel ke liye alag kam RPM — Long video par upar wali ranges rahen gi
+var SHORT_RPM = { facebook:[0.02,0.20], youtube:[0.03,0.08] };
+// Short RPM par mulk ka zarb (rough estimate)
+var SHORT_COUNTRY_MULT = {usa:1.0, uk:0.9, uae:0.5, pk:0.15};
+var NICHE_MULT = {comedy:0.75, vlog:0.90, tech:1.00, islamic:0.70, cleaning:1.00, gym:0.70, food:0.95, poetry:0.90, education:1.60, business:1.00, stories:0.85, animals:0.90, gaming:0.85, travel:1.00, kids:0.25, news:1.05, beauty:1.05};
+var NICHE_NAME = {comedy:'Comedy / Funny', vlog:'Vlog / Daily Life', tech:'Tech Review', islamic:'Islamic / Motivation', cleaning:'Safai / Cleaning Hacks', gym:'Gym / Fitness', food:'Food / Cooking', poetry:'Shayari / Poetry / Pashto Culture', education:'Education / Tutorials', business:'Business / Online Kamai', stories:'Stories / Reddit Stories', animals:'Animals / Pets / Wildlife', gaming:'Gaming', travel:'Travel / Gaon ki Zindagi', kids:'Kids / Cartoon', news:'News / Current Affairs', beauty:'Beauty / Fashion'};
+var PLAT_NAME = {facebook:'Facebook', tiktok:'TikTok', youtube:'YouTube'};
+var COUNTRY_NAME = {usa:'USA', uk:'UK / Europe', uae:'UAE / Gulf', pk:'Pakistan / India'};
+var FORMAT_NAME = {long:'Long video', short:'Short video / Reel'};
+
+// Language toggle — tamam translations ek hi jagah (T object) mein hain taake edit aasaan ho.
+var WA_NUMBER = '923340926285';
+var CTA_TEXT = {
+  ur: 'Assalam-o-Alaikum! Main Digital Pukhtaana join karna chahta hoon. Earning Calculator se mujhe apni kamai ka andaza mila hai, ab mujhe is system ko seekhna hai.',
+  en: 'Hello! I want to join Digital Pukhtaana. I got my earnings estimate from the Earning Calculator, now I want to learn this system.'
+};
+var T = {
+ur:{
+  heroPara:'Apne rozana views se andaza lagao ke Facebook, TikTok ya YouTube se mahine mein kitni kamai ho sakti hai — aur konsa platform tumhare liye best hai.',
+  lblPlatform:'Platform chuno', lblFormat:'Content format chuno', lblNiche:'Apna niche / content type', lblCountry:'Audience zyada tar kis mulk se hai?', lblViews:'Rozana kitne views aate hain?',
+  calcBtn:'Kamai ka andaza lagao', shareBtn:'Calculator share karo', resultTitle:'Tumhara mahana andaza (Estimated Range)', ideasTitle:'Is combination ke liye 3 original content ideas',
+  waBtn:'Ye result WhatsApp par bhejo', ctaBtn:'Digital Pukhtaana Join Karo', ctaTitle:'Digital Pukhtaana — agla qadam yahin se',
+  ctaPara:'Ye calculator sirf andaza deta hai. Asal system — sahi platform chunna, RPM barhana aur views ko asal kamai mein badalna — Digital Pukhtaana mein seekhaya jata hai. Creators ke liye, seedhi Roman Urdu mein.',
+  fbline:'Facebook par is system ko seekhna hai to Digital Pukhtaana join karo.',
+  tiktokNote:'TikTok Creator Rewards sirf 1 minute se lambi original video par milta hai. Chhoti video par ye andaza lagu nahi hota.',
+  youtubeShortsNote:'YouTube ne announce kiya hai ke 1 February 2027 se Shorts ki kamai sirf unhi channels ko milegi jin ke pichle 90 din mein 10 million qualified Shorts views hon. Is liye ye andaza aage chal kar chhote channels par lagu nahi hoga.',
+  resultNote:'Note: Ye sirf aik estimated range hai, guaranteed earning nahi. Asal RPM aur earning waqt ke saath badalti rehti hai — platform ki policy, kitne views monetized hue, audience kis mulk se hai, content ki lambai aur quality, aur mausam (Q4 mein rates aam tor par zyada, Q1 mein kam) is par asar daalte hain. TikTok par sirf qualified views (5 second se zyada, original 1-minute se lambi video) count hote hain, aur YouTube Shorts ki RPM long-form ke muqable mein bohat kam (takreeban $0.03–$0.08) hoti hai.',
+  footerHTML:'Digital Pukhtaana.<br>Ye calculator sirf estimated range deta hai, guaranteed earning nahi. Asal RPM aur earnings platform, monetized views, audience ke mulk, content aur time ke saath badalte rehte hain.',
+  howTitle:'How is this calculated?',
+  viewsSuffix:' views / din', perMonth:' / mahina (estimated range)', perDay:' / din',
+  noTikTokEarning:'Is format par TikTok Creator Rewards se kamai nahi hoti',
+  formatLong:'Long video', formatShort:'Short video / Reel', tiktokLong:'1 minute se lambi video', tiktokShort:'1 minute se chhoti video',
+  shareCopied:'Link copy ho gaya: ', sharePrompt:'Link copy karo:', shareText:'Apne views se mahana kamai ka estimated andaza lagao:',
+  waHeader:'Digital Pukhtaana Earning Calculator — mera result:',
+  waLabels:{platform:'Platform', format:'Format', niche:'Niche', country:'Mulk', views:'Rozana views', range:'Estimated range'},
+  niches:{comedy:'Comedy / Funny', vlog:'Vlog / Daily Life', tech:'Tech Review', islamic:'Islamic / Motivation', cleaning:'Safai / Cleaning Hacks', gym:'Gym / Fitness', food:'Food / Cooking', poetry:'Shayari / Poetry / Pashto Culture', education:'Education / Tutorials', business:'Business / Online Kamai', stories:'Stories / Reddit Stories', animals:'Animals / Pets / Wildlife', gaming:'Gaming', travel:'Travel / Gaon ki Zindagi', kids:'Kids / Cartoon', news:'News / Current Affairs', beauty:'Beauty / Fashion'},
+  countries:{usa:'USA', uk:'UK / Europe', uae:'UAE / Gulf', pk:'Pakistan / India'},
+  tips:{
+    facebook:'Facebook par 3 minute se lambi video par in-stream ad banta hai — idea ko lambay, dekhne par majboor karne walay format mein rakho.',
+    tiktok:'TikTok par Creator Rewards sirf 1 minute se lambi, original video par banta hai — idea ko 60 second se zyada rakho taake qualified view bane.',
+    youtube:'YouTube par 8 minute se lambi video mein darmiyan wala ad (mid-roll) lagta hai — idea ko detail mein rakho taake RPM barhe.'
+  },
+  hints:{
+    usa:'USA audience ke liye shuruaat tez aur seedhi rakho — pehle 3 second mein wajah batao ke ye video un ke kis kaam ki hai.',
+    uk:'UK / Europe audience ke liye waqt par aur saaf maloomat rakho — daawa kam, saboot zyada.',
+    uae:'UAE / Gulf mein zyada tar bahar rehne walay mulazim aur khandaan dekhte hain — ghar, khaana aur purani yaadon wala angle zor pakadta hai.',
+    pk:'Pakistan / India audience ke liye apni zabaan aur roz marra ki misaal istemal karo — mehngai, bijli aur roz ke masail foran judte hain.'
+  },
+  dyn:{
+    rpmNote:function(plat, fmt, niche, country){ return plat + ' (' + fmt + ') par ' + niche + ' ke liye ' + country + ' ki audience par ye estimated range banta hai — niche multipliers rough estimate hain, pakki raqam nahi, aur har view monetized nahi hota.'; },
+    bestIntro:function(niche, country, fmt){ return 'Isi combination (' + niche + ' + ' + country + ' + ' + fmt + ') par platforms ka andaza: '; },
+    bestHigher:function(best, cur){ return 'Comparatively sab se zyada monetization potential ' + best + ' par hai — tum abhi ' + cur + ' par ho, to wohi content ' + best + ' par bhi chalana shuru karo. '; },
+    bestSame:function(plat){ return 'Tum pehle se sab se zyada potential walay platform (' + plat + ') par ho — ab isi par watch time aur consistency barhao. '; }
+  },
+  howHTML:'<p><b>Formula:</b> <code>Mahana andaza = (Rozana views × 30 ÷ 1,000) × RPM × Niche asar</code></p>'
+    + '<p style="margin-top:8px"><b>RPM</b> ka matlab hai creator ko 1,000 views par asal mein kitne dollar milte hain. Ye woh raqam nahi jo advertiser deta hai (use CPM kehte hain) — RPM us ke baad ki, creator ke hisay wali raqam hai.</p>'
+    + '<ul>'
+    + '<li><b>Har view par paisa nahi banta.</b> Sirf un views par kamai hoti hai jin par asal mein ad chala (monetized views). Isi liye ye calculator jaan boojh kar darmiyani, mehfooz range istemal karta hai.</li>'
+    + '<li><b>Platform aur mulk sab se bara farq hai.</b> USA/UK ki audience par advertiser zyada deta hai, Pakistan ki audience par bohat kam — is liye wohi views aik mulk mein zyada aur doosray mein kam kamate hain.</li>'
+    + '<li><b>Niche ka asar (rough estimate):</b> Niche multipliers sirf rough estimate hain, pakki raqam nahi. Tech jaisay mauzu par advertiser zyada deta hai, comedy par kam lekin views zyada aate hain — calculator is farq ko aik chhota sa zarb laga kar dikhata hai.</li>'
+    + '<li>Niche multipliers zyada tar YouTube Studio data (300 channels) se nikale gaye hain, aur Facebook/TikTok par farq mukhtalif ho sakta hai. Education jaise niches ke andar bhi channels ka farq bohat bada hota hai.</li>'
+    + '<li><b>Short video / Reel:</b> Facebook Reels par RPM $0.02–$0.20 aur YouTube Shorts par $0.03–$0.08 rakha gaya hai, is liye short format ka andaza long video se bohat kam aata hai. Short RPM par mulk ka zarb bhi lagta hai (rough estimate): USA 1.0, UK 0.9, UAE 0.5, Pakistan 0.15 — ye bhi rough estimate hai, pakki raqam nahi.</li>'
+    + '<li><b>Misaal:</b> 50,000 views rozana × 30 = 15 lakh views mahana. Agar RPM $3 hai to 1,500 × $3 = takreeban $4,500 mahana — phir niche ka rough asar lagta hai.</li>'
+    + '</ul>',
+  ideas:{
+    comedy:['Roz marra ki ek aam si soorat ko hadd se zyada sanjeeda andaaz mein pesh karo — pehle 3 second mein punchline rakho.','Do kirdaar, ek behes: har video mein ek naya chhota mauzu lo, aakhir mein achanak twist rakho.','Ek mashhoor roz marra jumlay ko har baar nayi soorat mein istemal karo taake log agli video ka intezaar karein.'],
+    vlog:['Ek din, ek jagah: apne ilaqay ki woh jagah dikhao jo aam tor par log nahi dekhte.','Ek tay shuda budget mein kya kya milta hai — qeematon wala silsila, har video ek cheez.','Subah se raat tak ek hi kaam ko time-lapse mein dikhao, saath mein apni commentary.'],
+    tech:['Ek hi mobile ko 30 din baad dobara check karo — "kya ye ab bhi worth hai?"','Mehenga vs sasta: ek hi kaam dono se kar ke farq dikhao, waqt gin kar.','Ek aisi setting dikhao jo sab ke phone mein hai lekin koi istemal nahi karta.'],
+    islamic:['Ek hadees, ek aaj ki misaal — 60 second mein seedhi baat, koi ghumao phirao nahi.','Jumma se pehle 3 chhoti sunnatein, har ek ko 15 second mein amal karke dikhao.','Ek sawal lo, jawab do — comments se sawal chuno aur agle video mein jawab do.'],
+    cleaning:['Ek hi daagh, 3 mukhtalif gharelu tareeqay — konsa sab se tez kaam karta hai, timer ke saath.','Hotel wali chamak ghar par: ek cheez ko pehle aur baad mein dikhao, beech ka raaz aakhir mein batao.','Sab se gandi jagah saaf karo jo log aam tor par chhod dete hain — pehla shot hi sab se ganda rakho.'],
+    gym:['Bina gym, ghar par sirf ek kursi se poora workout — har exercise 30 second.','30 din roz ek hi exercise — pehle aur aakhir wale din ka farq saath saath dikhao.','Sab se aam galti jo naye log karte hain, usay pehle ghalat phir sahi karke dikhao.'],
+    food:['Ek hi sabzi, teen ilaqon ke andaaz — har andaaz ko waqt aur laagat ke saath tol kar dikhao.','Hotel wali plate ghar ki rasoi mein — pehle maharat wali chaal, phir poori tarkeeb apni zabaan mein.','Roz ki thali ko sehatmand banana bina zaiqa kharab kiye — pehle aur baad ki plate saath rakho.'],
+    poetry:['Apni likhi hui ek nazm ko ek hi maqam par khade ho kar sunao — har sher ke baad ek saans ka waqfa.','Ek purana muhawara lo, us ki asal kahani apne lafzon mein sunao, kisi aur ki video na dohrao.','Maa ki zabaan mein ek chhota sa kalam likho aur har lafz ka matlab screen par bhi dikhao.'],
+    education:['Ek mushkil sawal ko pehle aam galti se, phir sahi tareeqe se hal karo — farq saaf nazar aaye.','Ek hi mauzu ko 60 second, phir tafseel mein samjhao taake dono qism ke dekhne walay juden.','Apni note wali copy dikha kar samjhao — har nuskha tumhara apna likha hua ho, kahin se naqal na ho.'],
+    business:['Ek chhota sa online kaam pehle din se dikhao — laagat, waqt aur natija har roz likh kar.','Ek aam ghalti jo naye online kamane walay karte hain, us ka apna tajurba batao, wada na karo.','Do muft auzaar ka muqabla apne asal kaam par — konsa waqt bachata hai, saboot ke saath.'],
+    stories:['Apni likhi hui kahani ko teen hisson mein sunao — har hisse ke aakhir mein sawal chhodo.','Ek roz marra waqia ko pehle seedha, phir kirdaaron ki nazar se sunao — kahani tumhari apni ho.','Sunanay walon se ek lafz lo, usi lafz se foran ek chhoti kahani banao, pehle se likhi na ho.'],
+    animals:['Apne paltoo janwar ki ek aadat ko roz ek minute mein dikhao — tarbiyat ka har qadam khud karo.','Ek maqami janwar ko door se, bina tang kiye, us ki roz ki zindagi mein dikhao aur batao.','Janwar ke liye ghar par ek mehfooz khilona khud banao aur us ka rad-e-amal dikhao.'],
+    gaming:['Ek hi mission ko pehle aam tareeqe se, phir ek nayi chaal se khelo — waqt ka farq dikhao.','Naye khiladi ki paanch ghaltiyan apni gameplay mein dhoondo aur har ek ko sahi karke dikhao.','Ek purani mashhoor game ko aaj ke nazariye se khelo — kya cheez ab bhi mazay ki hai, apni raaye do.'],
+    travel:['Apne gaon ki subah ko bina taiyari ke dikhao — bazaar, khet aur log, sab apni nazar se.','Ek jagah par teen waqton mein jao — subah, dopahar, shaam — har baar kya badalta hai dikhao.','Ek ajnabi jagah tak paidal safar karo aur raaste ki har mushkil apni commentary ke saath dikhao.'],
+    kids:['Apni banayi hui ek chhoti kahani rangon aur awazon ke saath sunao — har kirdaar tumhara apna ho.','Ek aasan si cheez banana sikhao jo bachay badon ke saath mehfooz tareeqe se bana saken.','Ginti ya haroof ko ek khel mein badlo — har dafa naya sawal, jawab bachon ko khud sochna pade.'],
+    news:['Ek khabar ko pehle sirf sargaram haqaiq mein, phir us ke pas-e-manzar ke saath apni zabaan mein samjhao.','Ek hi waqiye par do mukhtalif raaye suno aur dono ko bina jhukao ke saamne rakho.','Apne ilaqay ke ek maslay par logon se chhoti chhoti baat cheet karo aur unhi ke lafz chalao.'],
+    beauty:['Ek hi look ko kam kharch aur zyada kharch walay samaan se banao — farq din ki roshni mein dikhao.','Apni asal jild par ek tarkeeb azmao aur pehle, darmiyan aur baad ki soorat imaandari se dikhao.','Ek aam ghalti jo sab karte hain, usay pehle ghalat phir durust tareeqe se karke dikhao.']
+  }
+},
+en:{
+  heroPara:'Use your daily views to estimate how much you could earn per month on Facebook, TikTok or YouTube — and which platform suits you best.',
+  lblPlatform:'Choose platform', lblFormat:'Choose content format', lblNiche:'Your niche / content type', lblCountry:'Where is most of your audience from?', lblViews:'How many views do you get per day?',
+  calcBtn:'Estimate my earnings', shareBtn:'Share calculator', resultTitle:'Your monthly estimate (Estimated Range)', ideasTitle:'3 original content ideas for this combination',
+  waBtn:'Send this result on WhatsApp', ctaBtn:'Join Digital Pukhtaana', ctaTitle:'Digital Pukhtaana — your next step starts here',
+  ctaPara:'This calculator only gives you an estimate. The real system — choosing the right platform, raising your RPM and turning views into actual income — is taught at Digital Pukhtaana, in simple, clear language for creators.',
+  fbline:'Want to learn this system on Facebook? Join Digital Pukhtaana.',
+  tiktokNote:'TikTok Creator Rewards only pays for original videos longer than 1 minute. This estimate does not apply to short videos.',
+  youtubeShortsNote:'YouTube has announced that from 1 February 2027, Shorts revenue will only go to channels with 10 million qualified Shorts views in the last 90 days. This estimate will not apply to smaller channels after that.',
+  resultNote:'Note: This is only an estimated range, not guaranteed earnings. Actual RPM and earnings change over time — platform policy, how many views are monetized, audience country, video length and quality, and season (rates are usually higher in Q4 and lower in Q1) all play a part. On TikTok only qualified views count (over 5 seconds, on original videos longer than 1 minute), and YouTube Shorts RPM is far lower than long-form (around $0.03–$0.08).',
+  footerHTML:'Digital Pukhtaana.<br>This calculator only gives an estimated range, not guaranteed earnings. Actual RPM and earnings change with platform, monetized views, audience country, content and time.',
+  howTitle:'How is this calculated?',
+  viewsSuffix:' views / day', perMonth:' / month (estimated range)', perDay:' / day',
+  noTikTokEarning:'No earnings from TikTok Creator Rewards on this format',
+  formatLong:'Long video', formatShort:'Short video / Reel', tiktokLong:'Video longer than 1 minute', tiktokShort:'Video shorter than 1 minute',
+  shareCopied:'Link copied: ', sharePrompt:'Copy this link:', shareText:'Estimate your monthly creator earnings from your views:',
+  waHeader:'Digital Pukhtaana Earning Calculator — my result:',
+  waLabels:{platform:'Platform', format:'Format', niche:'Niche', country:'Country', views:'Daily views', range:'Estimated range'},
+  niches:{comedy:'Comedy / Funny', vlog:'Vlog / Daily Life', tech:'Tech Reviews', islamic:'Islamic / Motivation', cleaning:'Cleaning Hacks', gym:'Gym / Fitness', food:'Food / Cooking', poetry:'Poetry / Pashto Culture', education:'Education / Tutorials', business:'Business / Making Money Online', stories:'Stories', animals:'Animals / Pets / Wildlife', gaming:'Gaming', travel:'Village Life / Travel', kids:'Kids / Cartoon', news:'News / Current Affairs', beauty:'Beauty / Fashion'},
+  countries:{usa:'USA', uk:'UK / Europe', uae:'UAE / Gulf', pk:'Pakistan / India'},
+  tips:{
+    facebook:'On Facebook, in-stream ads need videos over 3 minutes — keep the idea long and hard to stop watching.',
+    tiktok:'On TikTok, Creator Rewards needs original videos over 1 minute — keep it past 60 seconds so the view qualifies.',
+    youtube:'On YouTube, videos over 8 minutes can carry a mid-roll ad — go into detail so your RPM rises.'
+  },
+  hints:{
+    usa:'For a US audience, start fast and clear — say in the first 3 seconds why this video matters to them.',
+    uk:'For a UK / Europe audience, be on time and factual — less hype, more proof.',
+    uae:'In the UAE / Gulf, most viewers are workers and families living abroad — home, food and old memories connect strongly.',
+    pk:'For a Pakistan / India audience, use your own language and everyday examples — prices, electricity and daily problems connect instantly.'
+  },
+  dyn:{
+    rpmNote:function(plat, fmt, niche, country){ return 'On ' + plat + ' (' + fmt + ') for ' + niche + ' with a ' + country + ' audience, this is the estimated range — niche multipliers are a rough estimate, not a fixed amount, and not every view is monetized.'; },
+    bestIntro:function(niche, country, fmt){ return 'For this combination (' + niche + ' + ' + country + ' + ' + fmt + '), the platform estimates are: '; },
+    bestHigher:function(best, cur){ return 'The highest monetization potential is on ' + best + ' — you are on ' + cur + ' right now, so start posting the same content on ' + best + ' as well. '; },
+    bestSame:function(plat){ return 'You are already on the highest-potential platform (' + plat + ') — now focus on watch time and consistency. '; }
+  },
+  howHTML:'<p><b>Formula:</b> <code>Monthly estimate = (Daily views × 30 ÷ 1,000) × RPM × Niche effect</code></p>'
+    + '<p style="margin-top:8px"><b>RPM</b> means what a creator actually receives per 1,000 views. It is not what the advertiser pays (that is CPM) — RPM is the creator share after that.</p>'
+    + '<ul>'
+    + '<li><b>Not every view earns money.</b> Only views where an ad actually ran (monetized views) earn. That is why this calculator deliberately uses a middle, safe range.</li>'
+    + '<li><b>Platform and country make the biggest difference.</b> Advertisers pay more for a USA/UK audience and far less for a Pakistan audience — the same views earn more in one country and less in another.</li>'
+    + '<li><b>Niche effect (rough estimate):</b> Niche multipliers are only a rough estimate, not a fixed amount. Advertisers pay more on topics like tech, and less on comedy, though comedy gets more views — the calculator applies a small multiplier to show that gap.</li>'
+    + '<li>Niche multipliers are mostly drawn from YouTube Studio data (300 channels), and the gap can be different on Facebook/TikTok. Even inside a niche like Education, channels differ hugely from each other.</li>'
+    + '<li><b>Short video / Reel:</b> Facebook Reels RPM is set at $0.02–$0.20 and YouTube Shorts at $0.03–$0.08, so a short-format estimate is far lower than long video. A country multiplier also applies to short RPM (rough estimate): USA 1.0, UK 0.9, UAE 0.5, Pakistan 0.15 — also a rough estimate, not a fixed amount.</li>'
+    + '<li><b>Example:</b> 50,000 views a day × 30 = 1.5 million views a month. At $3 RPM that is 1,500 × $3 = about $4,500 a month — then the rough niche effect applies.</li>'
+    + '</ul>',
+  ideas:{
+    comedy:['Play an everyday situation dead-serious — land the punchline in the first 3 seconds.','Two characters, one argument: pick a small new topic each video and end on a sudden twist.','Take one familiar everyday phrase and use it in a new situation every time, so people wait for the next one.'],
+    vlog:['One day, one place: show a spot in your area that most people never see.','What can you get for a fixed budget — a price-check series, one item per video.','Film one job from morning to night in time-lapse, with your own commentary over it.'],
+    tech:['Revisit the same phone after 30 days — is it still worth it?','Expensive vs cheap: do the same job with both, timed, and show the gap.',"Show one setting that is on everyone's phone but almost nobody uses."],
+    islamic:['One hadith, one example from today — say it straight in 60 seconds, no going in circles.','Three small practices before Friday, each shown in 15 seconds, done properly.','Take a question from the comments and answer it in the next video.'],
+    cleaning:['One stain, three home methods — time each one and show which works fastest.','Hotel-level shine at home: show before and after of one thing, and save the key trick for the end.','Clean the dirtiest spot people usually skip — open on the worst shot first.'],
+    gym:['A full workout at home with just one chair — 30 seconds per exercise, no gym needed.','Do the same exercise daily for 30 days and show day one next to day thirty.','Show the most common beginner mistake — first the wrong way, then the right way.'],
+    food:['One vegetable, three regional styles — weigh up time and cost for each.','A restaurant plate in a home kitchen — show the pro trick first, then the full recipe in plain words.','Make the daily plate healthier without losing flavour — keep the before and after side by side.'],
+    poetry:['Recite a poem you wrote yourself, standing in one place — pause a breath after each verse.','Take an old proverb and tell its real story in your own words — do not repeat anyone else video.','Write a short piece in your mother tongue and show the meaning of each line on screen too.'],
+    education:['Solve one hard question first the common wrong way, then the right way — make the difference obvious.','Explain the same topic in 60 seconds, then in detail, so both kinds of viewers stay.','Teach from your own notebook on camera, with every tip written by you in your own words.'],
+    business:['Show one small online job from day one — write down cost, time and result every day.','Share one common mistake new online earners make, from your own experience — promise nothing.','Compare two free tools on your real work — show with proof which one saves time.'],
+    stories:['Tell a story you wrote yourself in three parts — leave a question at the end of each part.',"Tell an everyday incident first straight, then from the characters' side — the story must be your own.",'Take one word from your listeners and build a short story on it on the spot, nothing pre-written.'],
+    animals:['Show one habit of your pet in a one-minute clip each day — do every training step yourself.','Film a local animal from a distance, without disturbing it, in its daily life, and narrate.','Build a safe toy for an animal at home yourself and show its reaction.'],
+    gaming:['Play the same mission first the normal way, then with a new trick — show the time difference.','Find five beginner mistakes in your own gameplay and fix each one on camera.','Play a famous old game with fresh eyes — say honestly what is still fun, in your own words.'],
+    travel:['Show your village morning with no staging — market, fields and people, through your own eyes.','Visit one place at three times — morning, noon, evening — and show what changes each time.','Walk to an unfamiliar place and show every difficulty on the way, with your own commentary.'],
+    kids:['Tell a short story you created yourself, with colours and voices — every character your own.','Teach one easy thing that children can safely make together with adults.','Turn counting or letters into a game — a new question each time, and let the children work out the answer.'],
+    news:['Explain one story first with just the hard facts, then with its background, in plain language.','Hear two different views on the same event and put both in front of people without leaning.','Talk briefly to people about one local issue and run their own words.'],
+    beauty:['Create the same look with low-cost and high-cost products — show the difference in daylight.','Try one routine on your real skin and show before, during and after, honestly.','Show one common mistake everyone makes — first the wrong way, then the right way.']
+  }
+}
+};
+var currentLang = 'ur';
+function tr(){ return T[currentLang]; }
+var LAST_RESULT = null;
+function setLang(lang){
+  currentLang = lang;
+  var t = tr();
+  document.documentElement.lang = (lang === 'en') ? 'en' : 'ur-Latn';
+  document.getElementById('mainTitle').textContent = (lang === 'en') ? 'Creator Earnings Calculator' : 'Creator Earning Calculator';
+  document.title = (lang === 'en') ? 'Digital Pukhtaana — Earnings Calculator' : 'Digital Pukhtaana — Earning Calculator';
+  document.getElementById('heroPara').textContent = t.heroPara;
+  ['lblPlatform','lblFormat','lblNiche','lblCountry','lblViews','calcBtn','shareBtn','resultTitle','ideasTitle','waBtn','ctaBtn','ctaTitle','fbline','tiktokNote','youtubeShortsNote','resultNote'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.textContent = t[id];
+  });
+  document.getElementById('ctaPara').textContent = t.ctaPara;
+  document.getElementById('footerText').innerHTML = t.footerHTML;
+  document.getElementById('howTitle').textContent = t.howTitle;
+  document.getElementById('howBody').innerHTML = t.howHTML;
+  var cta = document.getElementById('ctaBtn');
+  cta.href = 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(CTA_TEXT[lang]);
+  document.getElementById('langUr').classList.toggle('active', lang === 'ur');
+  document.getElementById('langEn').classList.toggle('active', lang === 'en');
+  // Niche dropdown labels (values barqarar)
+  var nicheSel = document.getElementById('niche');
+  var nicheVal = nicheSel.value;
+  Array.prototype.forEach.call(nicheSel.options, function(op){ op.textContent = t.niches[op.value] || op.textContent; });
+  nicheSel.value = nicheVal;
+  updateFormatOptions();
+  updateViewsLabel();
+  var res = document.getElementById('result');
+  if(res.style.display === 'block'){ calculate(false); }
+}
+function getRPM(platform, country, format){
+  if(format === 'short' && SHORT_RPM[platform]){
+    var s = SHORT_RPM[platform];
+    var m = SHORT_COUNTRY_MULT[country] || 1.0;
+    return [s[0]*m, s[1]*m];
+  }
+  return RPM[platform][country];
+}
+function shareOnWhatsApp(){
+  calculate();
+  if(!LAST_RESULT) return;
+  var L = tr().waLabels;
+  var msg = tr().waHeader + '\n'
+    + L.platform + ': ' + LAST_RESULT.platform + '\n'
+    + L.format + ': ' + LAST_RESULT.format + '\n'
+    + L.niche + ': ' + LAST_RESULT.niche + '\n'
+    + L.country + ': ' + LAST_RESULT.country + '\n'
+    + L.views + ': ' + LAST_RESULT.views + '\n'
+    + L.range + ': ' + LAST_RESULT.range + '\n'
+    + tr().fbline;
+  window.open('https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(msg), '_blank');
+}
+function shareCalc(){
+  var url = window.location.href;
+  var data = {title:'Digital Pukhtaana — Creator Earning Calculator', text:tr().shareText, url:url};
+  if(navigator.share){
+    navigator.share(data).catch(function(){});
+  } else if(navigator.clipboard){
+    navigator.clipboard.writeText(url).then(function(){ alert(tr().shareCopied + url); }, function(){ prompt(tr().sharePrompt, url); });
+  } else {
+    prompt(tr().sharePrompt, url);
+  }
+}
+
+function getTips(){ return tr().tips; }
+function getHints(){ return tr().hints; }
+
+var slider = document.getElementById('views');
+var viewsVal = document.getElementById('viewsVal');
+slider.addEventListener('input', updateViewsLabel);
+function updateViewsLabel(){
+  viewsVal.textContent = Number(slider.value).toLocaleString('en-US') + tr().viewsSuffix;
+}
+
+function monthly(viewsPerDay, rpm){
+  return viewsPerDay * 30 / 1000 * rpm;
+}
+
+function fmt(n){ return '$' + Math.round(n).toLocaleString('en-US'); }
+
+function updateFormatOptions(){
+  var p = document.getElementById('platform').value;
+  var sel = document.getElementById('format');
+  var current = sel.value;
+  var tt = tr();
+  var opts = (p === 'tiktok')
+    ? [{value:'long', label:tt.tiktokLong}, {value:'short', label:tt.tiktokShort}]
+    : [{value:'long', label:tt.formatLong}, {value:'short', label:tt.formatShort}];
+  sel.innerHTML = '';
+  opts.forEach(function(o){
+    var op = document.createElement('option');
+    op.value = o.value;
+    op.textContent = o.label;
+    sel.appendChild(op);
+  });
+  sel.value = (current === 'short' || current === 'long') ? current : 'long';
+}
+
+function calculate(doScroll){
+  var p = document.getElementById('platform').value;
+  var f = document.getElementById('format').value;
+  var tt2 = tr();
+  var fLabel = document.getElementById('format').selectedOptions[0].textContent;
+  var n = document.getElementById('niche').value;
+  var c = document.getElementById('country').value;
+  var v = Number(slider.value);
+  var mult = NICHE_MULT[n];
+
+  // (1) Potential earning range — Short par Reels/Shorts RPM, Long par maujooda ranges
+  var base = getRPM(p, c, f);
+  var low = monthly(v, base[0]*mult);
+  var high = monthly(v, base[1]*mult);
+
+  // (2) Platforms ka wohi combination par muqabla — Short mein TikTok shamil nahi
+  var rows = [];
+  for (var k in RPM){
+    if(f === 'short' && k === 'tiktok') continue;
+    var b = getRPM(k, c, f);
+    rows.push({ key:k, name:PLAT_NAME[k], low: monthly(v, b[0]*mult), high: monthly(v, b[1]*mult), mid: monthly(v, (b[0]+b[1])/2*mult) });
+  }
+  rows.sort(function(a,b2){ return b2.mid - a.mid; });
+  var bestKey = rows[0].key;
+
+  var rangeText = (p === 'tiktok' && f === 'short')
+    ? tt2.noTikTokEarning
+    : fmt(low) + ' – ' + fmt(high) + tt2.perMonth;
+  document.getElementById('rangeOut').textContent = rangeText;
+  document.getElementById('rpmNote').textContent = (p === 'tiktok' && f === 'short') ? '' : tt2.dyn.rpmNote(PLAT_NAME[p], fLabel, tt2.niches[n], tt2.countries[c]);
+  document.getElementById('tiktokNote').style.display = (p === 'tiktok' && f === 'short') ? 'block' : 'none';
+  document.getElementById('youtubeShortsNote').style.display = (p === 'youtube' && f === 'short') ? 'block' : 'none';
+
+  var tips = getTips();
+  var bestText = tt2.dyn.bestIntro(tt2.niches[n], tt2.countries[c], fLabel) + rows.map(function(r){ return r.name + ' ' + fmt(r.low) + '–' + fmt(r.high); }).join(' | ') + '. ';
+  if (bestKey !== p){
+    bestText += tt2.dyn.bestHigher(PLAT_NAME[bestKey], PLAT_NAME[p]) + tips[bestKey];
+  } else {
+    bestText += tt2.dyn.bestSame(PLAT_NAME[p]) + tips[p];
+  }
+  document.getElementById('bestOut').textContent = bestText;
+
+  LAST_RESULT = { platform: PLAT_NAME[p], format: fLabel, niche: tt2.niches[n], country: tt2.countries[c], views: v.toLocaleString('en-US') + tt2.perDay, range: rangeText };
+
+  // (3) 3 original content ideas
+  var ol = document.getElementById('ideasOut');
+  ol.innerHTML = '';
+  var hint = getHints()[c];
+  tr().ideas[n].forEach(function(it, idx){
+    var li = document.createElement('li');
+    li.textContent = it + (idx === 0 ? ' ' + hint : '');
+    ol.appendChild(li);
+  });
+
+  var res = document.getElementById('result');
+  res.style.display = 'block';
+  if(doScroll !== false) res.scrollIntoView({behavior:'smooth', block:'start'});
+}
+updateFormatOptions();
+updateViewsLabel();
+</script>
+</body>
+</html>
